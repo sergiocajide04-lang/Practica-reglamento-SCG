@@ -1,1 +1,0 @@
-# Practica-reglamento-SCG
