@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Entrenador de reglamento de hockey sobre patines para árbitros: práctica por niveles y modo examen.">
+<meta name="theme-color" content="#0b1424">
+<title>Práctica Reglamento · Hockey sobre Patines</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🏑</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Fondo decorativo: líneas de pista -->
+<div class="rink-bg" aria-hidden="true">
+  <span class="rink-line rink-line--mid"></span>
+  <span class="rink-circle"></span>
+  <span class="rink-glow rink-glow--a"></span>
+  <span class="rink-glow rink-glow--b"></span>
+</div>
+
+<!-- Aviso de problemas de datos (solo si la validación falla) -->
+<div id="avisoDatos" class="aviso-datos" hidden role="alert"></div>
+
+<main id="app">
+
+  <!-- ==================== PANTALLA: INICIO ==================== -->
+  <section class="pantalla pantalla--activa" id="pantalla-inicio">
+    <header class="hero">
+      <h1 class="hero__titulo">
+        <span class="hero__titulo-1">Práctica</span>
+        <span class="hero__titulo-2">Reglamento</span>
+      </h1>
+      <p class="hero__sub">Entrenamiento del reglamento de hockey sobre patines</p>
+
+      <div class="marcador" role="group" aria-label="Resumen del banco de preguntas">
+        <div class="marcador__celda">
+          <span class="marcador__num" id="statTotal">—</span>
+          <span class="marcador__lbl">Preguntas</span>
+        </div>
+        <div class="marcador__sep" aria-hidden="true"></div>
+        <div class="marcador__celda">
+          <span class="marcador__num" id="statExamenes">—</span>
+          <span class="marcador__lbl">Exámenes</span>
+        </div>
+        <div class="marcador__sep" aria-hidden="true"></div>
+        <div class="marcador__celda">
+          <span class="marcador__num" id="statMejor">—</span>
+          <span class="marcador__lbl">Mejor nota</span>
+        </div>
+        <div class="marcador__sep" aria-hidden="true"></div>
+        <div class="marcador__celda">
+          <span class="marcador__num" id="statAcierto">—</span>
+          <span class="marcador__lbl">% acierto</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="modos" aria-label="Modos de entrenamiento">
+      <button class="modo modo--facil" type="button" data-modo="facil">
+        <span class="modo__icono" aria-hidden="true">🟢</span>
+        <span class="modo__titulo">Nivel Fácil</span>
+        <span class="modo__flecha" aria-hidden="true">→</span>
+      </button>
+
+      <button class="modo modo--medio" type="button" data-modo="medio">
+        <span class="modo__icono" aria-hidden="true">🟡</span>
+        <span class="modo__titulo">Nivel Medio</span>
+        <span class="modo__flecha" aria-hidden="true">→</span>
+      </button>
+
+      <button class="modo modo--dificil" type="button" data-modo="dificil">
+        <span class="modo__icono" aria-hidden="true">🔴</span>
+        <span class="modo__titulo">Nivel Difícil</span>
+        <span class="modo__flecha" aria-hidden="true">→</span>
+      </button>
+
+      <button class="modo modo--examen" type="button" data-modo="examen">
+        <span class="modo__icono" aria-hidden="true">🏆</span>
+        <span class="modo__titulo">Modo Examen</span>
+        <span class="modo__flecha" aria-hidden="true">→</span>
+      </button>
+    </nav>
+
+    <footer class="pie">
+      <p>Página web realizada por Sergio Cajide Gómez</p>
+    </footer>
+  </section>
+
+  <!-- ==================== PANTALLA: PRÁCTICA ==================== -->
+  <section class="pantalla" id="pantalla-practica" hidden>
+    <header class="barra">
+      <button class="btn btn--salir" type="button" data-accion="salir-practica">
+        <span aria-hidden="true">←</span> Salir
+      </button>
+      <span class="chip" id="practicaNivel">Nivel</span>
+      <span class="barra__contador" id="practicaContador">Pregunta 1</span>
+    </header>
+
+    <div class="tablero">
+      <div class="tablero__stat tablero__stat--ok">
+        <span class="tablero__num" id="practicaAciertos">0</span>
+        <span class="tablero__lbl">Aciertos</span>
+      </div>
+      <div class="tablero__stat tablero__stat--ko">
+        <span class="tablero__num" id="practicaFallos">0</span>
+        <span class="tablero__lbl">Fallos</span>
+      </div>
+      <div class="tablero__stat">
+        <span class="tablero__num" id="practicaPorcentaje">—</span>
+        <span class="tablero__lbl">% acierto</span>
+      </div>
+      <div class="tablero__stat">
+        <span class="tablero__num" id="practicaRestantes">0</span>
+        <span class="tablero__lbl">Sin ver</span>
+      </div>
+    </div>
+
+    <div class="progreso" aria-hidden="true"><span class="progreso__barra" id="practicaProgreso"></span></div>
+
+    <article class="tarjeta-pregunta">
+      <h2 class="tarjeta-pregunta__texto" id="practicaTexto"></h2>
+      <div class="opciones" id="practicaOpciones" role="group" aria-label="Opciones de respuesta"></div>
+      <div class="feedback" id="practicaFeedback" hidden aria-live="polite"></div>
+    </article>
+
+    <div class="acciones">
+      <button class="btn btn--primario" type="button" id="practicaSiguiente" hidden>
+        Siguiente pregunta <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== PANTALLA: EXAMEN (INTRO) ==================== -->
+  <section class="pantalla" id="pantalla-examen-intro" hidden>
+    <header class="barra">
+      <button class="btn btn--fantasma" type="button" data-accion="ir-inicio">
+        <span aria-hidden="true">←</span> Volver
+      </button>
+      <span class="chip chip--oro">Modo Examen</span>
+      <span></span>
+    </header>
+
+    <article class="panel panel--centrado">
+      <div class="panel__trofeo" aria-hidden="true">🏆</div>
+      <h2 class="panel__titulo">Examen de reglamento</h2>
+      <p class="panel__intro">Antes de empezar, revisa las condiciones de la prueba.</p>
+
+      <ul class="reglas">
+        <li><b>30 preguntas</b> seleccionadas al azar.</li>
+        <li>Para <b>aprobar</b> necesitas acertar <b>al menos 28 de las 30</b>.</li>
+        <li>Cada respuesta se corrige al momento y <b>no se puede cambiar</b>.</li>
+        <li>Al terminar podrás <b>revisar todas las preguntas falladas</b>.</li>
+      </ul>
+
+      <div class="acciones acciones--par">
+        <button class="btn btn--primario btn--grande" type="button" id="examenComenzar">
+          Comenzar examen
+        </button>
+        <button class="btn btn--secundario btn--grande" type="button" data-accion="ir-inicio">
+          Volver
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <!-- ==================== PANTALLA: EXAMEN ==================== -->
+  <section class="pantalla" id="pantalla-examen" hidden>
+    <header class="barra">
+      <button class="btn btn--salir" type="button" data-accion="salir-examen">
+        <span aria-hidden="true">←</span> Salir
+      </button>
+      <span class="chip chip--oro" id="examenNivelChip">Examen</span>
+      <span class="barra__contador" id="examenContador">1 / 30</span>
+    </header>
+
+    <div class="tablero">
+      <div class="tablero__stat tablero__stat--ok">
+        <span class="tablero__num" id="examenAciertos">0</span>
+        <span class="tablero__lbl">Aciertos</span>
+      </div>
+      <div class="tablero__stat tablero__stat--ko">
+        <span class="tablero__num" id="examenFallos">0</span>
+        <span class="tablero__lbl">Fallos</span>
+      </div>
+      <div class="tablero__stat">
+        <span class="tablero__num" id="examenRespondidas">0</span>
+        <span class="tablero__lbl">Respondidas</span>
+      </div>
+      <div class="tablero__stat">
+        <span class="tablero__num" id="examenParaAprobar">28</span>
+        <span class="tablero__lbl">Para aprobar</span>
+      </div>
+    </div>
+
+    <div class="progreso" aria-hidden="true"><span class="progreso__barra" id="examenProgreso"></span></div>
+
+    <article class="tarjeta-pregunta">
+      <h2 class="tarjeta-pregunta__texto" id="examenTexto"></h2>
+      <div class="opciones" id="examenOpciones" role="group" aria-label="Opciones de respuesta"></div>
+      <div class="feedback" id="examenFeedback" hidden aria-live="polite"></div>
+    </article>
+
+    <div class="acciones">
+      <button class="btn btn--primario" type="button" id="examenSiguiente" hidden>
+        Siguiente pregunta <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== PANTALLA: RESULTADO ==================== -->
+  <section class="pantalla" id="pantalla-resultado" hidden>
+    <article class="panel panel--centrado" id="resultadoPanel">
+      <div class="veredicto" id="resultadoVeredicto">
+        <span class="veredicto__icono" id="resultadoIcono" aria-hidden="true">🏆</span>
+        <h2 class="veredicto__titulo" id="resultadoTitulo">Examen aprobado</h2>
+      </div>
+
+      <div class="nota">
+        <span class="nota__valor" id="resultadoNota">0 / 30</span>
+        <span class="nota__pct" id="resultadoPorcentaje">0 %</span>
+      </div>
+
+      <div class="resumen">
+        <div class="resumen__item resumen__item--ok">
+          <span class="resumen__num" id="resultadoAciertos">0</span>
+          <span class="resumen__lbl">Aciertos</span>
+        </div>
+        <div class="resumen__item resumen__item--ko">
+          <span class="resumen__num" id="resultadoFallos">0</span>
+          <span class="resumen__lbl">Errores</span>
+        </div>
+      </div>
+
+      <p class="resultado__mensaje" id="resultadoMensaje"></p>
+
+      <div class="acciones acciones--par">
+        <button class="btn btn--primario btn--grande" type="button" id="resultadoRevisar">
+          Revisar fallos
+        </button>
+        <button class="btn btn--secundario btn--grande" type="button" id="resultadoRepetir">
+          Repetir examen
+        </button>
+        <button class="btn btn--fantasma btn--grande" type="button" data-accion="ir-inicio">
+          Volver al inicio
+        </button>
+      </div>
+    </article>
+  </section>
+
+  <!-- ==================== PANTALLA: REVISIÓN ==================== -->
+  <section class="pantalla" id="pantalla-revision" hidden>
+    <header class="barra">
+      <button class="btn btn--fantasma" type="button" id="revisionVolver">
+        <span aria-hidden="true">←</span> Resultado
+      </button>
+      <span class="chip chip--rojo">Revisión de fallos</span>
+      <span class="barra__contador" id="revisionContador"></span>
+    </header>
+
+    <div class="revision" id="revisionLista"></div>
+
+    <div class="acciones">
+      <button class="btn btn--secundario btn--grande" type="button" data-accion="ir-inicio">
+        Volver al inicio
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<script src="data/banco-300.js"></script>
+<script src="data/banco-100.js"></script>
+<script src="data/explicaciones-300.js"></script>
+<script src="data/explicaciones-100.js"></script>
+<script src="data/preguntas.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
